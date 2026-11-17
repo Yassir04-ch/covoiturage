@@ -1,10 +1,10 @@
 package ma.covoiturage.covoiturage.mapper;
 
 import ma.covoiturage.covoiturage.dto.request.VehiculeCreateRequest;
+import ma.covoiturage.covoiturage.dto.request.VehiculeUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.VehiculeResponse;
 import ma.covoiturage.covoiturage.entity.Vehicule;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface VehiculeMapper {
@@ -15,4 +15,8 @@ public interface VehiculeMapper {
 
     @Mapping(source = "condicteur.id" , target = "condicteurId")
     VehiculeResponse toResponse(Vehicule vehicule);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id" , ignore = true)
+    void updateVehicule(VehiculeUpdateRequest request , @MappingTarget Vehicule vehicule);
 }
