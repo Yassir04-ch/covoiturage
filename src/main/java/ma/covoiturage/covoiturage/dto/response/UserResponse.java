@@ -5,15 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
-    private Long id;
+    private UUID id;
     private String nom;
     private String prenom;
     private String email;
     private String telephone;
+    private String role;
     private String numeroPermis;
 }

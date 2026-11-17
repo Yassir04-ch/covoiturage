@@ -1,5 +1,6 @@
 package ma.covoiturage.covoiturage.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.ConducteurCreateRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Utilisateurs" , description = "Gestions des Utilisateurs")
 public class UserController {
     private final UserService userService;
 
