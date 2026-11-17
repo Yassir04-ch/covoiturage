@@ -34,7 +34,6 @@ public class VehiculeServiceImpl implements VehiculeService {
         return vehiculeMapper.toResponse(vehiculeRepository.save(vehicule));
     }
 
-
     @Override
     @Transactional
     public VehiculeResponse updateVehicule(long id , VehiculeUpdateRequest request){
@@ -73,5 +72,6 @@ public class VehiculeServiceImpl implements VehiculeService {
         List<Vehicule> vehicules = vehiculeRepository.findAll();
         return vehicules.stream().map(vehiculeMapper::toResponse).toList();
     }
+
 
 }

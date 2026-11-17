@@ -13,7 +13,7 @@ public interface VehiculeMapper {
     @Mapping(target = "conducteur" , ignore = true)
     Vehicule toEntity(VehiculeCreateRequest request);
 
-    @Mapping(source = "condicteur.id" , target = "condicteurId")
+    @Mapping(source = "conducteur.id" , target = "conducteurId")
     VehiculeResponse toResponse(Vehicule vehicule);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
