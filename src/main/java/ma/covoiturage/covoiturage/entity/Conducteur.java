@@ -2,6 +2,7 @@ package ma.covoiturage.covoiturage.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
