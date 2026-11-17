@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.ConducteurCreateRequest;
 import ma.covoiturage.covoiturage.dto.request.UserCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.UserResponse;
-import ma.covoiturage.covoiturage.service.UserService;
+import ma.covoiturage.covoiturage.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,25 +18,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Utilisateurs" , description = "Gestions des Utilisateurs")
 public class UserController {
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @PostMapping("/passagers")
     public ResponseEntity<UserResponse> createPassager(@Valid @RequestBody UserCreateRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createPassger(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userServiceImpl.createPassger(request));
     }
 
     @PostMapping("/admins")
     public ResponseEntity<UserResponse> createAdmin(@Valid @RequestBody UserCreateRequest request){
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createAdmin(request));
+    return ResponseEntity.status(HttpStatus.CREATED).body(userServiceImpl.createAdmin(request));
     }
 
     @PostMapping("/conducteurs")
     public ResponseEntity<UserResponse> createConducteur(@Valid @RequestBody ConducteurCreateRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createConducteur(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userServiceImpl.createConducteur(request));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id){
-        return ResponseEntity.ok(userService.getById(id));
+        return ResponseEntity.ok(userServiceImpl.getById(id));
     }
 }
