@@ -24,7 +24,7 @@ public class Trajet {
     private LocalDateTime dateDepart;
 
     @Column(nullable = false)
-    private Integer placesProposees;
+    private int placesProposees;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
