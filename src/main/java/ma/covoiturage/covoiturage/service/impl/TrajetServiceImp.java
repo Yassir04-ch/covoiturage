@@ -89,4 +89,6 @@ public class TrajetServiceImp implements TrajetService {
         List<Trajet> trajets = trajetRepository.findAll();
         return trajets.stream().map(trajetMapper::toResponse).toList();
     }
+
+
 }
