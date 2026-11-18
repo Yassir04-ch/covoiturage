@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface VehiculeService {
     VehiculeResponse createVehicule(VehiculeCreateRequest request);
 
-    VehiculeResponse updateVehicule(long id, VehiculeUpdateRequest request);
+    VehiculeResponse updateVehicule(long id, UUID conducteurId, VehiculeUpdateRequest request);
 
     void deleteVehicule(long id);
 

@@ -27,8 +27,8 @@ public class VehiculeController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<VehiculeResponse> updateVehicule(@PathVariable long id,@Valid @RequestBody VehiculeUpdateRequest request){
-        return ResponseEntity.ok(vehiculeService.updateVehicule(id , request));
+    public ResponseEntity<VehiculeResponse> updateVehicule(@PathVariable long id, @RequestParam UUID conducteurId ,@Valid @RequestBody VehiculeUpdateRequest request){
+        return ResponseEntity.ok(vehiculeService.updateVehicule(id , conducteurId , request));
     }
 
     @DeleteMapping("/{id}")

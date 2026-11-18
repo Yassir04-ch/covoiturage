@@ -21,5 +21,4 @@ public class VehiculeUpdateRequest {
     @Min(value = 1 , message = "La capacité minimale est 1")
     @Max(value = 8 ,message = "La capacité maximale est 8")
     private Integer capacite;
-    private UUID conducteurId;
 }

@@ -7,6 +7,7 @@ import ma.covoiturage.covoiturage.dto.request.VehiculeUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.VehiculeResponse;
 import ma.covoiturage.covoiturage.entity.Conducteur;
 import ma.covoiturage.covoiturage.entity.Vehicule;
+import ma.covoiturage.covoiturage.exception.ForbiddenException;
 import ma.covoiturage.covoiturage.exception.ResourceNotFoundException;
 import ma.covoiturage.covoiturage.mapper.VehiculeMapper;
 import ma.covoiturage.covoiturage.repository.ConducteurRepository;
@@ -36,9 +37,12 @@ public class VehiculeServiceImpl implements VehiculeService {
 
     @Override
     @Transactional
-    public VehiculeResponse updateVehicule(long id , VehiculeUpdateRequest request){
+    public VehiculeResponse updateVehicule(long id,UUID conducteurId , VehiculeUpdateRequest request){
         Vehicule vehicule = vehiculeRepository.findById(id)
                             .orElseThrow(()->new ResourceNotFoundException("Vehicule not Found"));
+        if(!vehicule.getConducteur().getId().equals(conducteurId)){
+            throw new ForbiddenException("Vous n'étes pas autorisé à modifier ce véhicule");
+        }
         vehiculeMapper.updateVehicule(request , vehicule);
         return vehiculeMapper.toResponse(vehicule);
     }
