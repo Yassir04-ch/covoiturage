@@ -2,6 +2,7 @@ package ma.covoiturage.covoiturage.service;
 
 import ma.covoiturage.covoiturage.dto.request.TrajetCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.TrajetResponse;
+import ma.covoiturage.covoiturage.entity.Trajet;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +17,8 @@ public interface TrajetService {
     List<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId);
 
     List<TrajetResponse> getAllTrajets();
+
+    void updateStatutTrajet(Trajet trajet);
 
     TrajetResponse annulerTrajet(long id , UUID conducteurId);
 }

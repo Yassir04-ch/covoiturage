@@ -3,12 +3,10 @@ package ma.covoiturage.covoiturage.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.PointArretCreateRequest;
-import ma.covoiturage.covoiturage.dto.response.PointArretResponse;
 import ma.covoiturage.covoiturage.entity.PointArret;
 import ma.covoiturage.covoiturage.entity.Trajet;
 import ma.covoiturage.covoiturage.exception.InvalideException;
 import ma.covoiturage.covoiturage.mapper.PointArretMapper;
-import ma.covoiturage.covoiturage.repository.PointArretRepository;
 import ma.covoiturage.covoiturage.service.PointArretService;
 import org.springframework.stereotype.Service;
 

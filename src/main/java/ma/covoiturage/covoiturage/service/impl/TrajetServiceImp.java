@@ -5,14 +5,17 @@ import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.TrajetCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.TrajetResponse;
 import ma.covoiturage.covoiturage.entity.Conducteur;
+import ma.covoiturage.covoiturage.entity.Reservation;
 import ma.covoiturage.covoiturage.entity.Trajet;
 import ma.covoiturage.covoiturage.entity.Vehicule;
+import ma.covoiturage.covoiturage.entity.enums.StatutReservation;
 import ma.covoiturage.covoiturage.entity.enums.StatutTrajet;
 import ma.covoiturage.covoiturage.exception.ForbiddenException;
 import ma.covoiturage.covoiturage.exception.InvalideException;
 import ma.covoiturage.covoiturage.exception.ResourceNotFoundException;
 import ma.covoiturage.covoiturage.mapper.TrajetMapper;
 import ma.covoiturage.covoiturage.repository.ConducteurRepository;
+import ma.covoiturage.covoiturage.repository.ReservationRepository;
 import ma.covoiturage.covoiturage.repository.TrajetRepository;
 import ma.covoiturage.covoiturage.repository.VehiculeRepository;
 import ma.covoiturage.covoiturage.service.PointArretService;
@@ -31,6 +34,7 @@ public class TrajetServiceImp implements TrajetService {
     private final VehiculeRepository vehiculeRepository;
     private final PointArretService pointArretService;
     private final TrajetMapper trajetMapper;
+    private final ReservationRepository reservationRepository;
 
     @Override
     @Transactional
@@ -97,16 +101,27 @@ public class TrajetServiceImp implements TrajetService {
 
     @Override
     @Transactional
+        public void updateStatutTrajet(Trajet trajet){
+        long totalPlacesReservees = reservationRepository.countTotalNombrePlacesByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
+        if(totalPlacesReservees >= trajet.getPlacesProposees()){
+            trajet.setStatut(StatutTrajet.COMPLET);
+        }
+    }
+
+    @Override
+    @Transactional
     public TrajetResponse annulerTrajet(long id, UUID conducteurId) {
         Trajet trajet = trajetRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Trajet not found"));
         if(!trajet.getConducteur().getId().equals(conducteurId)){
-            throw new ForbiddenException("Vous n'étes pas autorisé à annuleée cette ");
+            throw new ForbiddenException("Vous n'étes pas autorisé à annuleée ce trajet ");
         }
-        if(!trajet.getStatut().equals(StatutTrajet.PUBLIE)){
+        if(trajet.getStatut() != StatutTrajet.PUBLIE && trajet.getStatut() != StatutTrajet.COMPLET){
             throw  new InvalideException("Seuls les trajets publiés ou complets peuvent étre annulés");
         }
         trajet.setStatut(StatutTrajet.ANNULE);
+        List<Reservation> reservations = reservationRepository.findByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
+        reservations.forEach(e -> e.setStatut(StatutReservation.ANNULEE));
         return trajetMapper.toResponse(trajet);
     }
 
