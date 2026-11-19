@@ -6,7 +6,7 @@ import ma.covoiturage.covoiturage.entity.Trajet;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring" , uses = PointArretMapper.class)
 public interface TrajetMapper {
 
     @Mapping(target = "id" , ignore = true)
