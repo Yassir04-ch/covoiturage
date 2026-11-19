@@ -29,7 +29,7 @@ public class PointArretServiceImp implements PointArretService {
     }
 
     public void validePoitArret(List<PointArretCreateRequest> pointArrets){
-        List<PointArretCreateRequest> pointsSorted = pointArrets.stream().sorted(Comparator.comparing(PointArretCreateRequest::getOrder)).toList();
+        List<PointArretCreateRequest> pointsSorted = pointArrets.stream().sorted(Comparator.comparing(PointArretCreateRequest::getOrdre)).toList();
         Set<String> villes = new HashSet<>();
         for(int i = 0 ; i < pointsSorted.size() ; i++){
             if(!villes.add(pointsSorted.get(i).getVille().trim().toLowerCase(Locale.ROOT))){

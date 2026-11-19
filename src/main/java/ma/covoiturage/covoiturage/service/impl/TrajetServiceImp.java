@@ -15,6 +15,7 @@ import ma.covoiturage.covoiturage.mapper.TrajetMapper;
 import ma.covoiturage.covoiturage.repository.ConducteurRepository;
 import ma.covoiturage.covoiturage.repository.TrajetRepository;
 import ma.covoiturage.covoiturage.repository.VehiculeRepository;
+import ma.covoiturage.covoiturage.service.PointArretService;
 import ma.covoiturage.covoiturage.service.TrajetService;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class TrajetServiceImp implements TrajetService {
     private final TrajetRepository trajetRepository;
     private final ConducteurRepository conducteurRepository;
     private final VehiculeRepository vehiculeRepository;
+    private final PointArretService pointArretService;
     private final TrajetMapper trajetMapper;
 
     @Override
@@ -45,6 +47,9 @@ public class TrajetServiceImp implements TrajetService {
         trajet.setStatut(StatutTrajet.PUBLIE);
         trajet.setConducteur(conducteur);
         trajet.setVehicule(vehicule);
+
+        pointArretService.createPointArret(request.getPointArrets(),trajet);
+
         return trajetMapper.toResponse(trajetRepository.save(trajet));
     }
 
@@ -88,6 +93,21 @@ public class TrajetServiceImp implements TrajetService {
     public List<TrajetResponse> getAllTrajets() {
         List<Trajet> trajets = trajetRepository.findAll();
         return trajets.stream().map(trajetMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public TrajetResponse annulerTrajet(long id, UUID conducteurId) {
+        Trajet trajet = trajetRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Trajet not found"));
+        if(!trajet.getConducteur().getId().equals(conducteurId)){
+            throw new ForbiddenException("Vous n'étes pas autorisé à annuleée cette ");
+        }
+        if(!trajet.getStatut().equals(StatutTrajet.PUBLIE)){
+            throw  new InvalideException("Seuls les trajets publiés ou complets peuvent étre annulés");
+        }
+        trajet.setStatut(StatutTrajet.ANNULE);
+        return trajetMapper.toResponse(trajet);
     }
 
 

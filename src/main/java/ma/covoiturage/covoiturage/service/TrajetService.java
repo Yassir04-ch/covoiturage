@@ -16,4 +16,6 @@ public interface TrajetService {
     List<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId);
 
     List<TrajetResponse> getAllTrajets();
+
+    TrajetResponse annulerTrajet(long id , UUID conducteurId);
 }

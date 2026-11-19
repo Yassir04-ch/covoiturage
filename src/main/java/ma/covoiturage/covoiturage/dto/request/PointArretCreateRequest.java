@@ -18,7 +18,7 @@ public class PointArretCreateRequest {
     private String ville;
     @NotNull(message = "Order et Obligatoire")
     @Min(value = 1 , message = "le order minimum et 1")
-    private int order;
+    private Integer ordre;
     @NotNull(message = "Heure de passage et obligatoire")
     private LocalDateTime heurePassage;
     @NotNull(message = "prix depuis depart et obligatoire")
