@@ -29,22 +29,22 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class TrajetServiceTest {
     @Mock
-    TrajetRepository trajetRepository;
+    private TrajetRepository trajetRepository;
     @Mock
-    ConducteurRepository conducteurRepository;
+    private ConducteurRepository conducteurRepository;
     @Mock
-    VehiculeRepository vehiculeRepository;
+    private VehiculeRepository vehiculeRepository;
     @Mock
-    TrajetMapper trajetMapper;
+    private TrajetMapper trajetMapper;
 
     @InjectMocks
-    TrajetServiceImp trajetService;
+    private TrajetServiceImp trajetService;
 
-    TrajetCreateRequest request;
-    TrajetResponse response;
-    Trajet trajet;
-    Conducteur conducteur;
-    Vehicule vehicule;
+    private TrajetCreateRequest request;
+    private TrajetResponse response;
+    private Trajet trajet;
+    private Conducteur conducteur;
+    private Vehicule vehicule;
 
     UUID conducteurId;
     Long vehiculeId;

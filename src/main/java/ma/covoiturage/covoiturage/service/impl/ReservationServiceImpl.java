@@ -10,6 +10,7 @@ import ma.covoiturage.covoiturage.entity.Reservation;
 import ma.covoiturage.covoiturage.entity.Trajet;
 import ma.covoiturage.covoiturage.entity.enums.StatutReservation;
 import ma.covoiturage.covoiturage.entity.enums.StatutTrajet;
+import ma.covoiturage.covoiturage.exception.ForbiddenException;
 import ma.covoiturage.covoiturage.exception.InvalideException;
 import ma.covoiturage.covoiturage.exception.ResourceNotFoundException;
 import ma.covoiturage.covoiturage.mapper.ReservationMapper;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
@@ -99,7 +101,22 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public ReservationResponse annulerReservation(long reservationId) {
-        return null;
+    public ReservationResponse annulerReservation(long reservationId , UUID passagerId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+        if(reservation.getStatut() == StatutReservation.ANNULEE){
+            throw  new InvalideException("Reservation est déja annulée");
+        }
+        if(!reservation.getPassager().getId().equals(passagerId)){
+            throw new ForbiddenException("Vous n'étes pas autorisé à annuleée cette reservation");
+        }
+        Trajet trajet = reservation.getTrajet();
+        long delai = ChronoUnit.HOURS.between(LocalDateTime.now(), reservation.getTrajet().getDateDepart());
+        if(delai < 24){
+            throw new InvalideException("imposible annuler reservation : délai minimum de 24 heures avant le départ ");
+        }
+        reservation.setStatut(StatutReservation.ANNULEE);
+        trajetService.updateStatutTrajet(trajet);
+        return reservationMapper.toResponse(reservation);
     }
 }

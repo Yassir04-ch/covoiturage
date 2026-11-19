@@ -105,6 +105,8 @@ public class TrajetServiceImp implements TrajetService {
         long totalPlacesReservees = reservationRepository.countTotalNombrePlacesByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
         if(totalPlacesReservees >= trajet.getPlacesProposees()){
             trajet.setStatut(StatutTrajet.COMPLET);
+        }else {
+            trajet.setStatut(StatutTrajet.PUBLIE);
         }
     }
 
