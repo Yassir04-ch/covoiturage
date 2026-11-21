@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -162,11 +163,22 @@ public class TrajetServiceImp implements TrajetService {
     @Transactional
     public Page<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request , Pageable pageable) {
         if(request.getVilleDepart().equalsIgnoreCase(request.getVilleArrivee())){
-            throw new InvalideException("La ville de départ doit être différente de la ville d'arrivée");
+            throw new InvalideException("La ville de départ doit étre différente de la ville d'arrivée");
         }
         var specification = TrajetSpecification.rechercherTrajets(request.getVilleDepart() , request.getVilleArrivee(),request.getDate());
         Page<Trajet> trajets = trajetRepository.findAll(specification , pageable);
         return trajets.map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet));
     }
+
+    @Override
+    @Transactional
+    public Page<TrajetResponse> filterTrajetByPrixMax(BigDecimal prixMax , Pageable pageable){
+        Page<Trajet> trajets = trajetRepository.filterTrajetByPrixMax(prixMax , pageable);
+        if (prixMax == null || prixMax.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalideException("Le prix maximum doit étre positif");
+        }
+        return trajets.map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet));
+    }
+
 
 }
