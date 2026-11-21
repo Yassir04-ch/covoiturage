@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.ConducteurCreateRequest;
 import ma.covoiturage.covoiturage.dto.request.UserCreateRequest;
+import ma.covoiturage.covoiturage.dto.request.UserUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.UserResponse;
 import ma.covoiturage.covoiturage.service.UserService;
 import ma.covoiturage.covoiturage.service.impl.UserServiceImpl;
@@ -39,5 +40,10 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id){
         return ResponseEntity.ok(userService.getById(id));
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UserUpdateRequest request , @PathVariable UUID userId){
+        return ResponseEntity.ok(userService.updateUser(request , userId));
     }
 }

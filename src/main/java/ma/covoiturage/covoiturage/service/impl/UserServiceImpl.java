@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.ConducteurCreateRequest;
 import ma.covoiturage.covoiturage.dto.request.UserCreateRequest;
+import ma.covoiturage.covoiturage.dto.request.UserUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.UserResponse;
 import ma.covoiturage.covoiturage.entity.Admin;
 import ma.covoiturage.covoiturage.entity.Conducteur;
@@ -67,4 +68,26 @@ public class UserServiceImpl implements UserService {
         throw new IllegalStateException("Type utilisateur non reconnu");
     }
 
+    @Override
+    @Transactional
+    public UserResponse updateUser(UserUpdateRequest request , UUID userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new ResourceNotFoundException("Utilisateur not found"));
+        if(request.getEmail() != null && userRepository.existsByEmailAndIdNot(request.getEmail() ,userId)){
+            throw new ConflictException("Email est déja utilisé");
+        }
+        if(user instanceof Passager passager){
+            userMapper.updateUser(request,passager);
+            return userMapper.toPassagerResponse(passager);
+        }
+        if(user instanceof Conducteur conducteur){
+            userMapper.updateUser(request,conducteur);
+            return userMapper.toConducteurResponse(conducteur);
+        }
+        if(user instanceof Admin admin){
+            userMapper.updateUser(request,admin);
+            return userMapper.toAdminResponse(admin);
+        }
+        throw new IllegalStateException("type utilisateur non reconnu");
+    }
 }

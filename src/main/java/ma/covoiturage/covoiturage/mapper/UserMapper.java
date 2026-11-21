@@ -2,12 +2,13 @@ package ma.covoiturage.covoiturage.mapper;
 
 import ma.covoiturage.covoiturage.dto.request.ConducteurCreateRequest;
 import ma.covoiturage.covoiturage.dto.request.UserCreateRequest;
+import ma.covoiturage.covoiturage.dto.request.UserUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.UserResponse;
 import ma.covoiturage.covoiturage.entity.Admin;
 import ma.covoiturage.covoiturage.entity.Conducteur;
 import ma.covoiturage.covoiturage.entity.Passager;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import ma.covoiturage.covoiturage.entity.User;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -34,5 +35,9 @@ public interface UserMapper {
 
     @Mapping(target = "role" ,constant = "CONDUCTEUR")
     UserResponse toConducteurResponse(Conducteur conducteur);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    void updateUser(UserUpdateRequest request ,@MappingTarget User user);
 
 }
