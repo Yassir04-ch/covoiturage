@@ -18,5 +18,6 @@ public class TrajetResponse {
     private String statut;
     private UUID conducteurId;
     private Long vehiculeId;
+    private Long placesDisponibles;
     private List<PointArretResponse> pointArrets;
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import ma.covoiturage.covoiturage.dto.request.VehiculeCreateRequest;
 import ma.covoiturage.covoiturage.dto.request.VehiculeUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.VehiculeResponse;
+import ma.covoiturage.covoiturage.service.VehiculeService;
 import ma.covoiturage.covoiturage.service.impl.VehiculeServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Vehicules" , description = "Gestion des vihicules")
 public class VehiculeController {
-    private final VehiculeServiceImpl vehiculeService;
+    private final VehiculeService vehiculeService;
 
     @PostMapping
     public ResponseEntity<VehiculeResponse> createVehicule(@Valid @RequestBody VehiculeCreateRequest request){

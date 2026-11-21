@@ -56,8 +56,8 @@ public class TrajetServiceImp implements TrajetService {
         trajet.setVehicule(vehicule);
 
         pointArretService.createPointArret(request.getPointArrets(),trajet);
-
-        return trajetMapper.toResponse(trajetRepository.save(trajet));
+        TrajetResponse response = trajetMapper.toResponse(trajetRepository.save(trajet));
+        return efectPlacesDisponiblesToResponse(response , trajet);
     }
 
     public void valideDateAndPlaces(LocalDateTime dateDepart , int placesProposees , int vehiculeCapacite){
@@ -85,26 +85,27 @@ public class TrajetServiceImp implements TrajetService {
     public TrajetResponse getTrajetById(long id) {
         Trajet trajet = trajetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Trajét not found"));
-        return trajetMapper.toResponse(trajet);
+        TrajetResponse response = trajetMapper.toResponse(trajet);
+        return efectPlacesDisponiblesToResponse(response , trajet);
     }
 
     @Override
     @Transactional
     public List<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId) {
         List<Trajet> trajets = trajetRepository.findByConducteurId(conducteurId);
-        return trajets.stream().map(trajetMapper::toResponse).toList();
+        return trajets.stream().map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet)).toList();
     }
 
     @Override
     @Transactional
     public List<TrajetResponse> getAllTrajets() {
         List<Trajet> trajets = trajetRepository.findAll();
-        return trajets.stream().map(trajetMapper::toResponse).toList();
+        return trajets.stream().map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet)).toList();
     }
 
     @Override
     @Transactional
-        public void updateStatutTrajet(Trajet trajet){
+    public void updateStatutTrajet(Trajet trajet){
         long totalPlacesReservees = reservationRepository.countTotalNombrePlacesByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
         if(totalPlacesReservees >= trajet.getPlacesProposees()){
             trajet.setStatut(StatutTrajet.COMPLET);
@@ -116,26 +117,28 @@ public class TrajetServiceImp implements TrajetService {
     @Override
     @Transactional
     public TrajetResponse terminerTrajet(long id , UUID conducteurId){
-        Trajet trajet = valideTrajetAndCOnducteur(id , conducteurId);
+        Trajet trajet = valideTrajetAndConducteur(id , conducteurId);
         if(trajet.getDateDepart().isAfter(LocalDateTime.now())){
             throw new InvalideException("impossible de terminer le trajet avant l'heure de départ");
         }
         trajet.setStatut(StatutTrajet.TERMINE);
-        return trajetMapper.toResponse(trajet);
+        TrajetResponse response = trajetMapper.toResponse(trajet);
+        return efectPlacesDisponiblesToResponse(response , trajet);
     }
 
 
     @Override
     @Transactional
     public TrajetResponse annulerTrajet(long id, UUID conducteurId) {
-        Trajet trajet = valideTrajetAndCOnducteur(id , conducteurId);
+        Trajet trajet = valideTrajetAndConducteur(id , conducteurId);
         trajet.setStatut(StatutTrajet.ANNULE);
         List<Reservation> reservations = reservationRepository.findByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
         reservations.forEach(e -> e.setStatut(StatutReservation.ANNULEE));
-        return trajetMapper.toResponse(trajet);
+        TrajetResponse response = trajetMapper.toResponse(trajet);
+        return efectPlacesDisponiblesToResponse(response , trajet);
     }
 
-    public Trajet valideTrajetAndCOnducteur(long id , UUID conducteurId){
+    public Trajet valideTrajetAndConducteur(long id , UUID conducteurId){
         Trajet trajet = trajetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Trajet not found"));
         if(!trajet.getConducteur().getId().equals(conducteurId)){
@@ -147,6 +150,13 @@ public class TrajetServiceImp implements TrajetService {
         return trajet;
     }
 
+    public TrajetResponse efectPlacesDisponiblesToResponse(TrajetResponse response , Trajet trajet){
+        long placeReserve = reservationRepository.countTotalNombrePlacesByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
+        long placesDisponibles = trajet.getPlacesProposees() - placeReserve;
+        response.setPlacesDisponibles(placesDisponibles);
+        return response;
+    }
+
     @Override
     @Transactional
     public List<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request) {
@@ -155,7 +165,7 @@ public class TrajetServiceImp implements TrajetService {
         }
         var specification = TrajetSpecification.rechercherTrajets(request.getVilleDepart() , request.getVilleArrivee(),request.getDate());
         List<Trajet> trajets = trajetRepository.findAll(specification);
-        return trajets.stream().map(trajetMapper::toResponse).toList();
+        return trajets.stream().map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet)).toList();
     }
 
 }
