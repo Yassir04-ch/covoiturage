@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -119,4 +120,26 @@ public class ReservationServiceImpl implements ReservationService {
         trajetService.updateStatutTrajet(trajet);
         return reservationMapper.toResponse(reservation);
     }
+
+    @Override
+    @Transactional
+    public List<ReservationResponse> getAllReservation(){
+        List<Reservation> reservations = reservationRepository.findAll();
+        return reservations.stream().map(reservationMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public List<ReservationResponse> getReservationsByPassager(UUID passagerId){
+        List<Reservation> reservations = reservationRepository.getReservationsByPassagerId(passagerId);
+        return reservations.stream().map(reservationMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public List<ReservationResponse> getReservationsByTrajet(long trajetId){
+        List<Reservation> reservations = reservationRepository.getReservationsByTrajetId(trajetId);
+        return reservations.stream().map(reservationMapper::toResponse).toList();
+    }
+
 }

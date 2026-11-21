@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,5 +27,20 @@ public class Reservationcontroller {
     @PatchMapping("/{id}")
     public ResponseEntity<ReservationResponse> annulerReservation(@PathVariable long id , @RequestParam UUID passagerId){
         return  ResponseEntity.ok(reservationService.annulerReservation(id , passagerId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ReservationResponse>> getReservations(){
+        return ResponseEntity.ok(reservationService.getAllReservation());
+    }
+
+    @GetMapping("/passager/{passagerId}")
+    public ResponseEntity<List<ReservationResponse>> getReservationsByPassager(@PathVariable UUID passagerId){
+        return ResponseEntity.ok(reservationService.getReservationsByPassager(passagerId));
+    }
+
+    @GetMapping("/trajet/{trajetId}")
+    public ResponseEntity<List<ReservationResponse>> getReservationsByTrajet(@PathVariable long trajetId){
+        return ResponseEntity.ok(reservationService.getReservationsByTrajet(trajetId));
     }
 }

@@ -8,6 +8,10 @@ import ma.covoiturage.covoiturage.dto.request.TrajetCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.TrajetResponse;
 import ma.covoiturage.covoiturage.service.TrajetService;
 import ma.covoiturage.covoiturage.service.impl.TrajetServiceImp;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,13 +43,16 @@ public class TrajetController {
     }
 
     @GetMapping("/conducteur/{conducteurId}")
-    public ResponseEntity<List<TrajetResponse>> getTrajetsByConducteurId(@PathVariable UUID conducteurId){
-        return ResponseEntity.ok(trajetService.getTrajetsByConducteurId(conducteurId));
+    public ResponseEntity<Page<TrajetResponse>> getTrajetsByConducteurId(@PathVariable UUID conducteurId,
+                                       @RequestParam(defaultValue = "0" )int page , @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page,size);
+        return ResponseEntity.ok(trajetService.getTrajetsByConducteurId(conducteurId,pageable));
     }
 
     @GetMapping()
-    public ResponseEntity<List<TrajetResponse>> getAllTrajets(){
-        return ResponseEntity.ok(trajetService.getAllTrajets());
+    public ResponseEntity<Page<TrajetResponse>> getAllTrajets(@RequestParam(defaultValue = "0") int page , @RequestParam(defaultValue = "10")int size){
+        Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.ASC,"dateDepart"));
+        return ResponseEntity.ok(trajetService.getAllTrajets(pageable));
     }
 
     @PatchMapping("/annuler/{id}")
@@ -59,7 +66,9 @@ public class TrajetController {
     }
 
     @PostMapping("/recherche")
-    public ResponseEntity<List<TrajetResponse>> rechercherTrajets(@Valid @RequestBody RechercheTrajetRequest request){
-        return ResponseEntity.ok(trajetService.rechercherTrajets(request));
+    public ResponseEntity<Page<TrajetResponse>> rechercherTrajets(@Valid @RequestBody RechercheTrajetRequest request ,
+                                                                  @RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "10") int size ){
+        Pageable pageable = PageRequest.of(page , size , Sort.by(Sort.Direction.ASC,"dateDepart"));
+        return ResponseEntity.ok(trajetService.rechercherTrajets(request , pageable));
     }
 }

@@ -22,9 +22,10 @@ import ma.covoiturage.covoiturage.repository.VehiculeRepository;
 import ma.covoiturage.covoiturage.service.PointArretService;
 import ma.covoiturage.covoiturage.service.TrajetService;
 import ma.covoiturage.covoiturage.specification.TrajetSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -91,16 +92,16 @@ public class TrajetServiceImp implements TrajetService {
 
     @Override
     @Transactional
-    public List<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId) {
-        List<Trajet> trajets = trajetRepository.findByConducteurId(conducteurId);
-        return trajets.stream().map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet)).toList();
+    public Page<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId , Pageable pageable) {
+        Page<Trajet> trajets = trajetRepository.findByConducteurId(conducteurId , pageable);
+        return trajets.map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet));
     }
 
     @Override
     @Transactional
-    public List<TrajetResponse> getAllTrajets() {
-        List<Trajet> trajets = trajetRepository.findAll();
-        return trajets.stream().map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet)).toList();
+    public Page<TrajetResponse> getAllTrajets(Pageable pageable) {
+        Page<Trajet> trajets = trajetRepository.findAll(pageable);
+        return trajets.map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet));
     }
 
     @Override
@@ -159,13 +160,13 @@ public class TrajetServiceImp implements TrajetService {
 
     @Override
     @Transactional
-    public List<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request) {
+    public Page<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request , Pageable pageable) {
         if(request.getVilleDepart().equalsIgnoreCase(request.getVilleArrivee())){
             throw new InvalideException("La ville de départ doit être différente de la ville d'arrivée");
         }
         var specification = TrajetSpecification.rechercherTrajets(request.getVilleDepart() , request.getVilleArrivee(),request.getDate());
-        List<Trajet> trajets = trajetRepository.findAll(specification);
-        return trajets.stream().map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet)).toList();
+        Page<Trajet> trajets = trajetRepository.findAll(specification , pageable);
+        return trajets.map(trajet -> efectPlacesDisponiblesToResponse(trajetMapper.toResponse(trajet),trajet));
     }
 
 }

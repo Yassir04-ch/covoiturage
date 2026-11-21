@@ -4,6 +4,8 @@ import ma.covoiturage.covoiturage.dto.request.RechercheTrajetRequest;
 import ma.covoiturage.covoiturage.dto.request.TrajetCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.TrajetResponse;
 import ma.covoiturage.covoiturage.entity.Trajet;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,9 +17,9 @@ public interface TrajetService {
 
     TrajetResponse getTrajetById(long id);
 
-    List<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId);
+    Page<TrajetResponse> getTrajetsByConducteurId(UUID conducteurId , Pageable pageable);
 
-    List<TrajetResponse> getAllTrajets();
+    Page<TrajetResponse> getAllTrajets(Pageable pageable);
 
     void updateStatutTrajet(Trajet trajet);
 
@@ -25,5 +27,5 @@ public interface TrajetService {
 
     TrajetResponse annulerTrajet(long id , UUID conducteurId);
 
-    List<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request);
+    Page<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request , Pageable pageable);
 }
