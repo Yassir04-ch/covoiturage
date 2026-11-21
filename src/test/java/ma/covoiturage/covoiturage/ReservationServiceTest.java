@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -94,7 +95,7 @@ public class ReservationServiceTest {
 
     @Test
     void createReservationSuccess() {
-        ReservationResponse response = new ReservationResponse();
+        response = new ReservationResponse();
         when(passagerRepository.findById(passagerId)).thenReturn(Optional.of(passager));
         when(trajetRepository.findById(1L)).thenReturn(Optional.of(trajet));
         when(pointArretRepository.findById(1L)).thenReturn(Optional.of(pointMontee));
@@ -210,4 +211,44 @@ public class ReservationServiceTest {
         assertThrows(InvalideException.class, () -> reservationService.annulerReservation(1L, passagerId));
         verify(trajetService, never()).updateStatutTrajet(any());
     }
+
+    @Test
+    void getAllReservation() {
+        response = new ReservationResponse();
+        when(reservationRepository.findAll()).thenReturn(List.of(reservation));
+        when(reservationMapper.toResponse(reservation)).thenReturn(response);
+        List<ReservationResponse> result = reservationService.getAllReservation();
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(response, result.get(0));
+        verify(reservationRepository).findAll();
+        verify(reservationMapper).toResponse(reservation);
+    }
+
+    @Test
+    void getReservationsByPassager() {
+        response = new ReservationResponse();
+        when(reservationRepository.getReservationsByPassagerId(passagerId)).thenReturn(List.of(reservation));
+        when(reservationMapper.toResponse(reservation)).thenReturn(response);
+        List<ReservationResponse> result = reservationService.getReservationsByPassager(passagerId);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(response, result.get(0));
+        verify(reservationRepository).getReservationsByPassagerId(passagerId);
+        verify(reservationMapper).toResponse(reservation);
+    }
+
+    @Test
+    void getReservationsByTrajet() {
+        when(reservationRepository.getReservationsByTrajetId(1L)).thenReturn(List.of(reservation));
+        when(reservationMapper.toResponse(reservation)).thenReturn(response);
+        List<ReservationResponse> result = reservationService.getReservationsByTrajet(1L);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(response, result.get(0));
+        verify(reservationRepository).getReservationsByTrajetId(1L);
+        verify(reservationMapper).toResponse(reservation);
+    }
+
+
 }
