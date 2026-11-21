@@ -10,9 +10,7 @@ import ma.covoiturage.covoiturage.entity.Reservation;
 import ma.covoiturage.covoiturage.entity.Trajet;
 import ma.covoiturage.covoiturage.entity.enums.StatutReservation;
 import ma.covoiturage.covoiturage.entity.enums.StatutTrajet;
-import ma.covoiturage.covoiturage.exception.ForbiddenException;
-import ma.covoiturage.covoiturage.exception.InvalideException;
-import ma.covoiturage.covoiturage.exception.ResourceNotFoundException;
+import ma.covoiturage.covoiturage.exception.*;
 import ma.covoiturage.covoiturage.mapper.ReservationMapper;
 import ma.covoiturage.covoiturage.repository.PassagerRepository;
 import ma.covoiturage.covoiturage.repository.PointArretRepository;
@@ -42,13 +40,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationCreateRequest request) {
         Passager passager = passagerRepository.findById(request.getPassagerId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Passager not found"));
+                        .orElseThrow(() -> new PassagerNotFound("Passager not found"));
         Trajet trajet = trajetRepository.findById(request.getTrajetId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Trajet not found"));
+                    .orElseThrow(() -> new TrajetNotFound("Trajet not found"));
         PointArret pointMontee = pointArretRepository.findById(request.getPointMonteeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Point Montee not found"));
+                .orElseThrow(() -> new PoinArretNotFound("Point Montee not found"));
         PointArret pointDescente = pointArretRepository.findById(request.getPointDescenteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Point Descente not found"));
+                .orElseThrow(() -> new PoinArretNotFound("Point Descente not found"));
         ValideTrajet(trajet , request.getNombrePlaces());
         validePassager(passager.getId() ,trajet.getId());
         validePoints(pointMontee , pointDescente , trajet);
@@ -104,7 +102,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public ReservationResponse annulerReservation(long reservationId , UUID passagerId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Reservation not found"));
+                        .orElseThrow(() -> new ReservationNotFound("Reservation not found"));
         if(reservation.getStatut() == StatutReservation.ANNULEE){
             throw  new InvalideException("Reservation est déja annulée");
         }

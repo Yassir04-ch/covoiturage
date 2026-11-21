@@ -11,9 +11,7 @@ import ma.covoiturage.covoiturage.entity.Trajet;
 import ma.covoiturage.covoiturage.entity.Vehicule;
 import ma.covoiturage.covoiturage.entity.enums.StatutReservation;
 import ma.covoiturage.covoiturage.entity.enums.StatutTrajet;
-import ma.covoiturage.covoiturage.exception.ForbiddenException;
-import ma.covoiturage.covoiturage.exception.InvalideException;
-import ma.covoiturage.covoiturage.exception.ResourceNotFoundException;
+import ma.covoiturage.covoiturage.exception.*;
 import ma.covoiturage.covoiturage.mapper.TrajetMapper;
 import ma.covoiturage.covoiturage.repository.ConducteurRepository;
 import ma.covoiturage.covoiturage.repository.ReservationRepository;
@@ -45,9 +43,9 @@ public class TrajetServiceImp implements TrajetService {
     @Transactional
     public TrajetResponse createTrajet(TrajetCreateRequest request) {
         Conducteur conducteur = conducteurRepository.findById(request.getConducteurId())
-                .orElseThrow(()->new ResourceNotFoundException("conducteur not found"));
+                .orElseThrow(()->new ConducteurNotFound("conducteur not found"));
         Vehicule vehicule = vehiculeRepository.findById(request.getVehiculeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicule not found"));
+                .orElseThrow(() -> new VehiculeNotFound("Vehicule not found"));
         if(!conducteur.getId().equals(vehicule.getConducteur().getId())){
             throw new ForbiddenException("véhicule n'appartient pas à ce conducteur");
         }

@@ -7,8 +7,10 @@ import ma.covoiturage.covoiturage.dto.request.VehiculeUpdateRequest;
 import ma.covoiturage.covoiturage.dto.response.VehiculeResponse;
 import ma.covoiturage.covoiturage.entity.Conducteur;
 import ma.covoiturage.covoiturage.entity.Vehicule;
+import ma.covoiturage.covoiturage.exception.ConducteurNotFound;
 import ma.covoiturage.covoiturage.exception.ForbiddenException;
 import ma.covoiturage.covoiturage.exception.ResourceNotFoundException;
+import ma.covoiturage.covoiturage.exception.VehiculeNotFound;
 import ma.covoiturage.covoiturage.mapper.VehiculeMapper;
 import ma.covoiturage.covoiturage.repository.ConducteurRepository;
 import ma.covoiturage.covoiturage.repository.VehiculeRepository;
@@ -29,7 +31,7 @@ public class VehiculeServiceImpl implements VehiculeService {
     @Transactional
     public VehiculeResponse createVehicule(VehiculeCreateRequest request){
         Conducteur conducteur = conducteurRepository.findById(request.getConducteurId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Conducteur not found"));
+                                .orElseThrow(() -> new ConducteurNotFound("Conducteur not found"));
         Vehicule vehicule = vehiculeMapper.toEntity(request);
         vehicule.setConducteur(conducteur);
         return vehiculeMapper.toResponse(vehiculeRepository.save(vehicule));
@@ -39,7 +41,7 @@ public class VehiculeServiceImpl implements VehiculeService {
     @Transactional
     public VehiculeResponse updateVehicule(long id,UUID conducteurId , VehiculeUpdateRequest request){
         Vehicule vehicule = vehiculeRepository.findById(id)
-                            .orElseThrow(()->new ResourceNotFoundException("Vehicule not Found"));
+                            .orElseThrow(()->new VehiculeNotFound("Vehicule not Found"));
         if(!vehicule.getConducteur().getId().equals(conducteurId)){
             throw new ForbiddenException("Vous n'étes pas autorisé à modifier ce véhicule");
         }
@@ -51,7 +53,7 @@ public class VehiculeServiceImpl implements VehiculeService {
     @Transactional
     public void deleteVehicule(long id){
         Vehicule vehicule = vehiculeRepository.findById(id)
-                            .orElseThrow(() -> new ResourceNotFoundException("Vehicule note found"));
+                            .orElseThrow(() -> new VehiculeNotFound("Vehicule note found"));
         vehiculeRepository.delete(vehicule);
     }
 
@@ -59,7 +61,7 @@ public class VehiculeServiceImpl implements VehiculeService {
     @Transactional
     public VehiculeResponse getVehiculeById(long id) {
         Vehicule vehicule = vehiculeRepository.findById(id)
-                            .orElseThrow(() -> new ResourceNotFoundException("Vehicule note found"));
+                            .orElseThrow(() -> new VehiculeNotFound("Vehicule note found"));
         return vehiculeMapper.toResponse(vehicule);
     }
 
