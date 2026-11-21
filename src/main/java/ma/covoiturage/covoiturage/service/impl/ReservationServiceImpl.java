@@ -113,7 +113,7 @@ public class ReservationServiceImpl implements ReservationService {
         Trajet trajet = reservation.getTrajet();
         long delai = ChronoUnit.HOURS.between(LocalDateTime.now(), reservation.getTrajet().getDateDepart());
         if(delai < 24){
-            throw new InvalideException("imposible annuler reservation : délai minimum de 24 heures avant le départ ");
+            throw new InvalideException("impossible annuler reservation : délai minimum de 24 heures avant le départ ");
         }
         reservation.setStatut(StatutReservation.ANNULEE);
         trajetService.updateStatutTrajet(trajet);

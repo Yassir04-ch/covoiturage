@@ -135,6 +135,6 @@ public class TrajetServiceTest {
     void trajedeletNotFound(){
         when(trajetRepository.findById(trajetId)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> trajetService.deleteTrajet(trajetId ,conducteurId));
-        verify(trajetRepository, never()).delete(any());
+        verify(trajetRepository, never()).delete((Trajet) any());
     }
 }

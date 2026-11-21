@@ -2,6 +2,7 @@ package ma.covoiturage.covoiturage.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import ma.covoiturage.covoiturage.dto.request.RechercheTrajetRequest;
 import ma.covoiturage.covoiturage.dto.request.TrajetCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.TrajetResponse;
 import ma.covoiturage.covoiturage.entity.Conducteur;
@@ -20,8 +21,10 @@ import ma.covoiturage.covoiturage.repository.TrajetRepository;
 import ma.covoiturage.covoiturage.repository.VehiculeRepository;
 import ma.covoiturage.covoiturage.service.PointArretService;
 import ma.covoiturage.covoiturage.service.TrajetService;
+import ma.covoiturage.covoiturage.specification.TrajetSpecification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -112,20 +115,47 @@ public class TrajetServiceImp implements TrajetService {
 
     @Override
     @Transactional
+    public TrajetResponse terminerTrajet(long id , UUID conducteurId){
+        Trajet trajet = valideTrajetAndCOnducteur(id , conducteurId);
+        if(trajet.getDateDepart().isAfter(LocalDateTime.now())){
+            throw new InvalideException("impossible de terminer le trajet avant l'heure de départ");
+        }
+        trajet.setStatut(StatutTrajet.TERMINE);
+        return trajetMapper.toResponse(trajet);
+    }
+
+
+    @Override
+    @Transactional
     public TrajetResponse annulerTrajet(long id, UUID conducteurId) {
-        Trajet trajet = trajetRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Trajet not found"));
-        if(!trajet.getConducteur().getId().equals(conducteurId)){
-            throw new ForbiddenException("Vous n'étes pas autorisé à annuleée ce trajet ");
-        }
-        if(trajet.getStatut() != StatutTrajet.PUBLIE && trajet.getStatut() != StatutTrajet.COMPLET){
-            throw  new InvalideException("Seuls les trajets publiés ou complets peuvent étre annulés");
-        }
+        Trajet trajet = valideTrajetAndCOnducteur(id , conducteurId);
         trajet.setStatut(StatutTrajet.ANNULE);
         List<Reservation> reservations = reservationRepository.findByTrajetIdAndStatut(trajet.getId() , StatutReservation.CONFIRMEE);
         reservations.forEach(e -> e.setStatut(StatutReservation.ANNULEE));
         return trajetMapper.toResponse(trajet);
     }
 
+    public Trajet valideTrajetAndCOnducteur(long id , UUID conducteurId){
+        Trajet trajet = trajetRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Trajet not found"));
+        if(!trajet.getConducteur().getId().equals(conducteurId)){
+            throw new ForbiddenException("Vous n'étes pas autorisé à annulée ou terminée  ce trajet ");
+        }
+        if(trajet.getStatut() != StatutTrajet.PUBLIE && trajet.getStatut() != StatutTrajet.COMPLET){
+            throw  new InvalideException("Seuls les trajets publiés ou complets peuvent étre annulés ou terminés");
+        }
+        return trajet;
+    }
+
+    @Override
+    @Transactional
+    public List<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request) {
+        if(request.getVilleDepart().equalsIgnoreCase(request.getVilleArrivee())){
+            throw new InvalideException("La ville de départ doit être différente de la ville d'arrivée");
+        }
+        var specification = TrajetSpecification.rechercherTrajets(request.getVilleDepart() , request.getVilleArrivee(),request.getDate());
+        List<Trajet> trajets = trajetRepository.findAll(specification);
+        return trajets.stream().map(trajetMapper::toResponse).toList();
+    }
 
 }

@@ -1,5 +1,6 @@
 package ma.covoiturage.covoiturage.service;
 
+import ma.covoiturage.covoiturage.dto.request.RechercheTrajetRequest;
 import ma.covoiturage.covoiturage.dto.request.TrajetCreateRequest;
 import ma.covoiturage.covoiturage.dto.response.TrajetResponse;
 import ma.covoiturage.covoiturage.entity.Trajet;
@@ -20,5 +21,9 @@ public interface TrajetService {
 
     void updateStatutTrajet(Trajet trajet);
 
+    TrajetResponse terminerTrajet(long id , UUID conducteurId);
+
     TrajetResponse annulerTrajet(long id , UUID conducteurId);
+
+    List<TrajetResponse> rechercherTrajets(RechercheTrajetRequest request);
 }
